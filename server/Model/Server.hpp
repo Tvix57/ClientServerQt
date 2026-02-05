@@ -3,6 +3,9 @@
 
 #include <QMap>
 #include <QByteArray>
+#include <QThread>
+#include <QJsonObject>
+
 
 class Server {
 public:

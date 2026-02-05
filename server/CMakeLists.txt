@@ -9,22 +9,34 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Qt6Core Qt6Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Quick Qml)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Quick Qml)
+
+set(CPP_SOURCE
+        ./main.cpp
+        ./View/ServerWindow.cpp
+        ./Model/Server.cpp
+)
+
+set(HPP_SOURCE
+        ./View/ServerWindow.hpp
+        ./Model/Server.hpp
+)
+
+set(UI_SOURCE
+    UI/ServerWindow.qml
+)
 
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        Model/Server.cpp
-        Model/Server.hpp
+        ${CPP_SOURCE}
+        ${HPP_SOURCE}
+        ${UI_SOURCE}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(server
         MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
+        ${PROJECT_SOURCES}   
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET server APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -44,7 +56,20 @@ else()
     endif()
 endif()
 
-target_link_libraries(server PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+qt_add_qml_module(server
+    URI "server"
+    VERSION 1.0
+        QML_FILES UI/ServerWindow.qml
+        QML_FILES UI/ClientDataRow.qml
+        QML_FILES UI/ClientDataWindow.qml
+)
+
+target_link_libraries(server PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Quick
+    Qt6::Qml
+)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
